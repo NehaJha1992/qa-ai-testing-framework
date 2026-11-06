@@ -1,0 +1,9 @@
+# Placeholder: there is no real staging system. Shows how a second environment is configured.
+base_url: https://staging.example.com
+timeout_seconds: 10
+headless: true
+start_mock_server: false
+tokens:
+  admin: CHANGE_ME   # override with ADMIN_TOKEN
+  user_a: CHANGE_ME  # override with USER_A_TOKEN
+  user_b: CHANGE_ME  # override with USER_B_TOKEN

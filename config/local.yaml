@@ -1,0 +1,8 @@
+base_url: http://127.0.0.1:8000
+timeout_seconds: 5
+headless: true
+start_mock_server: true   # conftest starts mock_app for this environment
+tokens:
+  admin: token-admin
+  user_a: token-user-a
+  user_b: token-user-b

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Mock Fintech App</title>
+  <style>
+    body { font-family: sans-serif; max-width: 480px; margin: 2rem auto; }
+    fieldset { margin-bottom: 1.5rem; }
+    label { display: block; margin: 0.5rem 0; }
+    .success { color: #0a7d2c; }
+    .error { color: #b00020; }
+    [hidden] { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Mock Fintech App</h1>
+
+  <form id="registration-form" data-testid="registration-form">
+    <fieldset>
+      <legend>Register</legend>
+      <label>Name <input data-testid="reg-name" name="name"></label>
+      <label>Email <input data-testid="reg-email" name="email"></label>
+      <label>Account type
+        <select data-testid="reg-account-type" name="accountType">
+          <option value="basic">basic</option>
+          <option value="premium">premium</option>
+        </select>
+      </label>
+      <button type="submit" data-testid="reg-submit">Register</button>
+      <p class="success" data-testid="reg-success" hidden>
+        <span>Registration successful. User ID: </span><span data-testid="reg-user-id"></span>
+      </p>
+      <p class="error" data-testid="reg-error" hidden></p>
+    </fieldset>
+  </form>
+
+  <form id="transaction-form" data-testid="transaction-form">
+    <fieldset>
+      <legend>New transaction</legend>
+      <label>Sender user ID <input data-testid="tx-user-id" name="userId"></label>
+      <label>Amount <input data-testid="tx-amount" name="amount"></label>
+      <label>Type
+        <select data-testid="tx-type" name="type">
+          <option value="transfer">transfer</option>
+          <option value="deposit">deposit</option>
+          <option value="withdrawal">withdrawal</option>
+        </select>
+      </label>
+      <label>Recipient user ID <input data-testid="tx-recipient-id" name="recipientId"></label>
+      <button type="submit" data-testid="tx-submit">Submit</button>
+      <p class="success" data-testid="tx-success" hidden>
+        <span>Transaction created. ID: </span><span data-testid="tx-id"></span>
+      </p>
+      <p class="error" data-testid="tx-error" hidden></p>
+    </fieldset>
+  </form>
+
+  <script>
+    // The demo page always calls the API as admin, so it can act for any user.
+    const TOKEN = "token-admin";
+
+    async function post(url, payload) {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + TOKEN },
+        body: JSON.stringify(payload),
+      });
+      return { ok: response.ok, data: await response.json() };
+    }
+
+    function show(prefix, result, idTestId, successTestId) {
+      const success = document.querySelector(`[data-testid="${successTestId}"]`);
+      const error = document.querySelector(`[data-testid="${prefix}-error"]`);
+      success.hidden = true;
+      error.hidden = true;
+      if (result.ok) {
+        document.querySelector(`[data-testid="${idTestId}"]`).textContent = result.data.id;
+        success.hidden = false;
+      } else {
+        error.textContent = result.data.error.message;
+        error.hidden = false;
+      }
+    }
+
+    document.getElementById("registration-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const result = await post("/api/users", {
+        name: form.name.value,
+        email: form.email.value,
+        accountType: form.accountType.value,
+      });
+      show("reg", result, "reg-user-id", "reg-success");
+    });
+
+    document.getElementById("transaction-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const payload = {
+        userId: form.userId.value,
+        amount: form.amount.value === "" ? null : Number(form.amount.value),
+        type: form.type.value,
+      };
+      if (form.recipientId.value !== "") payload.recipientId = form.recipientId.value;
+      const result = await post("/api/transactions", payload);
+      show("tx", result, "tx-id", "tx-success");
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+fastapi==0.142.2
+uvicorn==0.54.0
+pydantic==2.13.5
+pytest==9.1.1
+pytest-playwright==0.9.0
+playwright==1.63.0
+pytest-html==4.2.0
+requests==2.34.2
+Faker==40.41.0
+PyYAML==6.0.3
+locust==2.46.7
+mcp==2.3.0
